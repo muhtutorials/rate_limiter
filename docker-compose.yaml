@@ -1,0 +1,31 @@
+services:
+  nodejs:
+    image: rate_limiter
+    build: .
+    container_name: nodejs
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./env/nodejs.env
+    restart: always
+    depends_on:
+      - mongodb
+      - redis
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - mongodb:/data/db
+    env_file:
+      - ./env/mongodb.env
+    restart: always
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+volumes:
+  node_modules:
+  mongodb:
