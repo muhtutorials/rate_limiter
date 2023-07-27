@@ -16,11 +16,11 @@ const requestRateLimiter = (config = {}) => {
       if (!user) return next();
     }
 
-    const [_, requestsLeft] = await cache
-      .multi()
-      .set(user, rate, { EX: 3600, NX: true })
-      .decrBy(user, routeWeight)
-      .exec();
+    const [_, requestsLeft] = await Promise.all([
+      cache.set(user, rate, { EX: 3600, NX: true }),
+      cache.decrBy(user, routeWeight)      
+    ]);
+  
     if (requestsLeft < 0) {
       const retryAfter = await cache.ttl(user);
       res.set('Retry-After', retryAfter);
